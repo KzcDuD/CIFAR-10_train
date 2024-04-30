@@ -10,8 +10,8 @@ from sklearn.model_selection import train_test_split
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
 # Hyper-parameters 
-num_epochs = 5
-batch_size = 4
+num_epochs = 38
+batch_size = 168
 learning_rate = 0.001
 
 transform = transforms.Compose(
@@ -23,7 +23,7 @@ dataset = torchvision.datasets.CIFAR10(root='./data', train=True,
                                         download=True, transform=transform)
 
 # Split the dataset into training and testing sets
-train_dataset, test_dataset = train_test_split(dataset, test_size=0.2, random_state=42)
+train_dataset, test_dataset = train_test_split(dataset, test_size=0.2, random_state=42) # random_state 指定隨機狀態
 
 
 train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size,
@@ -58,7 +58,7 @@ class ConvNet(nn.Module):
 model = ConvNet().to(device)
 
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 n_total_steps = len(train_loader)
 for epoch in range(num_epochs):
@@ -75,7 +75,7 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
 
-        if (i+1) % 2000 == 0:
+        if (i+1) % 200 == 0:
             print (f'Epoch [{epoch+1}/{num_epochs}], Step [{i+1}/{n_total_steps}], Loss: {loss.item():.4f}')
 
 print('Finished Training')
@@ -96,7 +96,7 @@ with torch.no_grad():
         n_samples += labels.size(0)
         n_correct += (predicted == labels).sum().item()
         
-        for i in range(batch_size):
+        for i in range(labels.size(0)):
             label = labels[i]
             pred = predicted[i]
             if (label == pred):
